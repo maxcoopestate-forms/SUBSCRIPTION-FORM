@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXCOOP - Coop City Anambra Subscription Form</title>
+    <link rel="stylesheet" href="maxcoop-form.css">
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- jsPDF Library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logos">
+                <div class="logo-item">MAXCOOP</div>
+                <div class="logo-item">M</div>
+                <div class="logo-item">🏛️ COOP CITY ANAMBRA</div>
+            </div>
+            <div class="photo-box">
+                <p>AFFIX<br>A PASSPORT<br>PHOTOGRAPH</p>
+            </div>
+        </div>
+
+        <!-- Hero Image Section -->
+        <div class="hero-section">
+            <div class="hero-text">
+                <h2>COOP CITY, ANAMBRA</h2>
+                <p>Building Dreams, Creating Communities</p>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="form-title">
+            <h1>COOP CITY, ANAMBRA <span class="subtitle">| SUBSCRIPTION FORM</span></h1>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating and sending your form... Please wait...</p>
+        </div>
+
+        <form id="maxcoopForm" class="subscription-form">
+            <!-- SECTION 1: SUBSCRIBER'S DETAILS -->
+            <div class="section-header">SECTION 1: SUBSCRIBER'S DETAILS</div>
+            <p class="instruction">Please complete all fields in block letters. Fields marked with asterisks (*) are mandatory. Tick boxes where appropriate.</p>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>NAME*</label>
+                    <div class="name-title">
+                        <label><input type="checkbox" name="title" value="MR"> MR</label>
+                        <label><input type="checkbox" name="title" value="MRS"> MRS</label>
+                        <label><input type="checkbox" name="title" value="MISS"> MISS</label>
+                    </div>
+                    <input type="text" name="surname" class="block-input" placeholder="Surname" required>
+                    <input type="text" name="otherNames" class="block-input" placeholder="Other Names" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>NAME OF SPOUSE <span class="small-text">(If Applicable)</span></label>
+                    <input type="text" name="spouseSurname" class="block-input" placeholder="Surname">
+                    <input type="text" name="spouseOtherNames" class="block-input" placeholder="Other Names">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>ADDRESS*</label>
+                    <input type="text" name="address" class="block-input" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>DATE OF BIRTH*</label>
+                    <input type="date" name="dob" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>GENDER*</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="gender" value="MALE" required> MALE</label>
+                        <label><input type="radio" name="gender" value="FEMALE" required> FEMALE</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>MARITAL STATUS*</label>
+                    <select name="maritalStatus" required>
+                        <option value="">Select...</option>
+                        <option value="SINGLE">Single</option>
+                        <option value="MARRIED">Married</option>
+                        <option value="DIVORCED">Divorced</option>
+                        <option value="WIDOWED">Widowed</option>
+                    </select>
+                </div>
+                <div class="form-group half-width">
+                    <label>NATIONALITY*</label>
+                    <input type="text" name="nationality" value="Nigerian" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>OCCUPATION*</label>
+                    <input type="text" name="occupation" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>EMPLOYER'S NAME</label>
+                    <input type="text" name="employerName">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>NATURE OF BUSINESS</label>
+                    <input type="text" name="businessNature">
+                </div>
+                <div class="form-group half-width">
+                    <label>YEARS OF EMPLOYMENT/BUSINESS</label>
+                    <input type="number" name="yearsOfEmployment" min="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>COUNTRY OF RESIDENCE*</label>
+                    <input type="text" name="countryOfResidence" value="Nigeria" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>LANGUAGE SPOKEN</label>
+                    <input type="text" name="languageSpoken" value="English">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>EMAIL ADDRESS*</label>
+                    <input type="email" name="email" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>OTHER SOURCE OF INCOME (IF ANY)</label>
+                    <input type="text" name="otherIncome">
+                </div>
+                <div class="form-group half-width">
+                    <label>MOBILE NUMBER*</label>
+                    <input type="tel" name="mobileNumber" placeholder="08012345678" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>IDENTIFICATION CARD TYPE:*</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="idType" value="NATIONAL_ID"> NATIONAL ID CARD</label>
+                        <label><input type="checkbox" name="idType" value="DRIVERS_LICENCE"> DRIVER'S LICENCE</label>
+                        <label><input type="checkbox" name="idType" value="INTERNATIONAL_PASSPORT"> INTERNATIONAL PASSPORT</label>
+                        <label><input type="checkbox" name="idType" value="NIN"> NIN</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>ARE YOU A POLITICALLY EXPOSED PERSON?*</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="pep" value="YES" required> YES</label>
+                        <label><input type="radio" name="pep" value="NO" required> NO</label>
+                    </div>
+                </div>
+                <div class="form-group half-width">
+                    <label>IF YES, what category?</label>
+                    <input type="text" name="pepCategory">
+                </div>
+            </div>
+
+            <!-- SECTION 2: NEXT OF KIN -->
+            <div class="section-header">SECTION 2: NEXT OF KIN</div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>NAME*</label>
+                    <input type="text" name="nokName" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>PHONE NUMBER*</label>
+                    <input type="tel" name="nokPhone" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>EMAIL ADDRESS</label>
+                    <input type="email" name="nokEmail">
+                </div>
+                <div class="form-group half-width">
+                    <label>ADDRESS*</label>
+                    <textarea name="nokAddress" rows="2" required></textarea>
+                </div>
+            </div>
+
+            <!-- SECTION 3: SUBSCRIBER'S DECLARATION -->
+            <div class="section-header">SECTION 3: SUBSCRIBER'S DECLARATION</div>
+
+            <div class="declaration-text">
+                <p>I hereby affirm that all information provided as a requirement for the purchase of the Coop City, Anambra state, situated at Ozubulu, Anambra state is true and any false or inaccurate information given by me may decline or may be rejected by Max.</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>TYPE OF PLOT:*</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="plotType" value="RESIDENTIAL" required> Residential</label>
+                        <label><input type="checkbox" name="plotType" value="COMMERCIAL"> Commercial (attracts 20%)</label>
+                    </div>
+                </div>
+                <div class="form-group half-width">
+                    <label>NUMBER OF PLOTS*</label>
+                    <input type="number" name="numberOfPlots" min="1" value="1" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>PLOT SIZE:*</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="plotSize" value="464SQM" required> 464 SQM</label>
+                        <label><input type="checkbox" name="cornerPiece" value="YES"> Corner piece (attracts 10%)</label>
+                    </div>
+                </div>
+                <div class="form-group half-width">
+                    <label>PAYMENT PLAN:*</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="paymentPlan" value="3_MONTHS" required> 3 Months</label>
+                        <label><input type="checkbox" name="paymentPlan" value="6_MONTHS"> 6 Months</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>SIGNATURE (Type Full Name)*</label>
+                    <input type="text" name="signature" placeholder="Type your full name" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>DATE*</label>
+                    <input type="date" name="declarationDate" required>
+                </div>
+            </div>
+
+            <!-- FOR REFERRAL DETAILS -->
+            <div class="section-header">FOR REFERRAL DETAILS (Optional)</div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>REFERRAL NAME</label>
+                    <input type="text" name="referralName">
+                </div>
+                <div class="form-group half-width">
+                    <label>REFERRAL PHONE</label>
+                    <input type="tel" name="referralPhone">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>REFERRAL EMAIL</label>
+                    <input type="email" name="referralEmail">
+                </div>
+                <div class="form-group half-width">
+                    <label>REFERRAL DATE</label>
+                    <input type="date" name="referralDate">
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-row">
+                <button type="submit" class="submit-btn">📧 SUBMIT APPLICATION</button>
+            </div>
+
+            <p class="form-note">* Upon submission, a PDF copy will be automatically generated and sent to maxcoopforms@gmail.com</p>
+        </form>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="bank-details">
+                <p><strong>MAKE ALL PAYMENTS DIRECTLY INTO:</strong></p>
+                <div class="bank-info">
+                    <p><strong>POLARIS MAX ONITSHA</strong><br>
+                    1st Floor, Grace and Faith House<br>
+                    Beside UBA Bank, Onitsha-Enugu Express Way<br>
+                    Onitsha, Anambra State</p>
+                    
+                    <p><strong>POLARIS MAX UTUTU</strong><br>
+                    No 237 Ututu/Anambra Road<br>
+                    Behind Mama and Filling Station<br>
+                    Max Construction Housing Coop<br>
+                    Ututu/Maku, Anambra State</p>
+                    
+                    <p><strong>POLARIS MAX NNEWI</strong><br>
+                    1st Floor & Egedegede<br>
+                    Opp Polaris Bank, Umu Emed<br>
+                    Nnewi, Anambra State</p>
+                </div>
+            </div>
+            <div class="contact">
+                <p><strong>MAX CONSTRUCTION<br>HOUSING COOP</strong></p>
+                <p class="phone">5402057281</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="maxcoop-form.js"></script>
+</body>
+</html>
