@@ -1,20 +1,9 @@
-// MAXCOOP Subscription Form - With PDF Generation and Email Sending
+// MAXCOOP Subscription Form - With PDF Generation and Gmail Integration
 // ========================================================================
-
-// IMPORTANT: Replace these with your actual EmailJS credentials
-// Get them from: https://www.emailjs.com/
-const EMAILJS_CONFIG = {
-    serviceID: 'service_uvjlho9',      // Replace with your EmailJS Service ID
-    templateID: 'template_fkb5ssq',    // Replace with your EmailJS Template ID
-    publicKey: 'RBO6mnqrVLP293RXO'       // Replace with your EmailJS Public Key
-};
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('maxcoopForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
-
-    // Initialize EmailJS
-    emailjs.init(EMAILJS_CONFIG.publicKey);
 
     // Auto-set today's date for declaration
     const today = new Date().toISOString().split('T')[0];
@@ -40,25 +29,97 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Generate PDF
             const pdfBlob = await generatePDF(formData);
-
-            // Send email with PDF attachment
-            await sendEmail(formData, pdfBlob);
+            const fileName = `MAXCOOP_${formData.subscriber.surname}_${Date.now()}.pdf`;
 
             // Hide loading
             loadingIndicator.style.display = 'none';
 
-            // Success message
-            alert('✅ SUCCESS!\n\nYour subscription form has been submitted successfully!\n\nA PDF copy has been sent to maxcoopforms@gmail.com\n\nThank you for choosing MAXCOOP!');
+            // Try to share via mobile (best option)
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'MAXCOOP Subscription Form',
+                            text: 'Please send this subscription form to maxcoopforms@gmail.com',
+                            files: [file]
+                        });
+                        
+                        // Show success message after sharing
+                        alert('✅ PDF Generated!\n\nPlease:\n1. Select Gmail from the share menu\n2. Add recipient: maxcoopforms@gmail.com\n3. Click Send\n\nThank you!');
+                        return;
+                    }
+                } catch (shareError) {
+                    console.log('Share failed, falling back to download:', shareError);
+                }
+            }
 
-            // Optional: Reset form after submission
-            // form.reset();
+            // Fallback: Download PDF and open Gmail compose
+            downloadPDF(pdfBlob, fileName);
+            
+            // Wait a moment for download to start
+            setTimeout(() => {
+                openGmailCompose(formData.subscriber.fullName);
+                
+                // Show instructions
+                showInstructions(fileName);
+            }, 500);
 
         } catch (error) {
             console.error('Submission error:', error);
             loadingIndicator.style.display = 'none';
-            alert('❌ OOPS!\n\nThere was an error submitting your form.\n\nPlease try again or contact us at 5402057281\n\nError: ' + error.message);
+            alert('❌ Error generating PDF.\n\nPlease try again or contact: 5402057281\n\nError: ' + error.message);
         }
     });
+
+    // Download PDF
+    function downloadPDF(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Open Gmail compose window
+    function openGmailCompose(subscriberName) {
+        const subject = encodeURIComponent(`MAXCOOP Subscription - ${subscriberName}`);
+        const body = encodeURIComponent(
+            `Dear MAXCOOP Admin,\n\n` +
+            `Please find attached my subscription form for Coop City, Anambra.\n\n` +
+            `Name: ${subscriberName}\n\n` +
+            `Thank you!\n`
+        );
+        
+        // Try Gmail web first (better for mobile)
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+        window.open(gmailUrl, '_blank');
+    }
+
+    // Show clear instructions
+    function showInstructions(filename) {
+        const instructions = `
+📧 NEXT STEPS:
+
+1. ✅ Your PDF has been downloaded: "${filename}"
+
+2. 📱 Gmail should open in a new tab/window
+
+3. ✉️ In Gmail:
+   • TO: maxcoopforms@gmail.com
+   • Click the 📎 attachment icon
+   • Select the downloaded PDF
+   • Click SEND
+
+That's it! Thank you for choosing MAXCOOP! 🏡
+        `.trim();
+
+        alert(instructions);
+    }
 
     // Validate form
     function validateForm() {
@@ -295,47 +356,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Convert to blob
         return doc.output('blob');
-    }
-
-    // Send email with PDF attachment
-    async function sendEmail(formData, pdfBlob) {
-        // Convert blob to base64
-        const base64PDF = await blobToBase64(pdfBlob);
-
-        // Prepare email parameters
-        const emailParams = {
-            to_email: 'maxcoopforms@gmail.com',
-            from_name: formData.subscriber.fullName,
-            from_email: formData.subscriber.email,
-            subscriber_name: formData.subscriber.fullName,
-            mobile_number: formData.subscriber.mobileNumber,
-            plot_type: formData.declaration.plotType,
-            number_of_plots: formData.declaration.numberOfPlots,
-            payment_plan: formData.declaration.paymentPlan,
-            submission_date: formData.submissionDate,
-            pdf_attachment: base64PDF,
-            pdf_name: `MAXCOOP_${formData.subscriber.surname}_${Date.now()}.pdf`
-        };
-
-        // Send via EmailJS
-        return emailjs.send(
-            EMAILJS_CONFIG.serviceID,
-            EMAILJS_CONFIG.templateID,
-            emailParams
-        );
-    }
-
-    // Convert blob to base64
-    function blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64 = reader.result.split(',')[1];
-                resolve(base64);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
     }
 
     // Helper function to get checked radio value

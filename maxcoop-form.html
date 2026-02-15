@@ -6,9 +6,6 @@
     <title>MAXCOOP - Coop City Anambra Subscription Form</title>
     <link rel="stylesheet" href="maxcoop-form.css">
     
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <!-- jsPDF Library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -43,7 +40,7 @@
         <!-- Loading Indicator -->
         <div id="loadingIndicator" class="loading-indicator" style="display: none;">
             <div class="spinner"></div>
-            <p>Generating and sending your form... Please wait...</p>
+            <p>Generating your PDF... Please wait...</p>
         </div>
 
         <form id="maxcoopForm" class="subscription-form">
@@ -288,10 +285,10 @@
 
             <!-- Submit Button -->
             <div class="form-row">
-                <button type="submit" class="submit-btn">📧 SUBMIT APPLICATION</button>
+                <button type="submit" class="submit-btn">📧 GENERATE PDF & SEND</button>
             </div>
 
-            <p class="form-note">* Upon submission, a PDF copy will be automatically generated and sent to maxcoopforms@gmail.com</p>
+            <p class="form-note">* PDF will be generated and your Gmail will open automatically. Just add maxcoopforms@gmail.com and send!</p>
         </form>
 
         <!-- Footer -->
