@@ -178,56 +178,77 @@ async function generatePDF(data, passportImageData, idDocuments) {
     // ========================================
     // ID DOCUMENTS SECTION
     // ========================================
-    if (data.subscriber.idType && data.subscriber.idType !== 'N/A') {
+    
+    // Check if any ID documents were uploaded
+    const uploadedIds = [];
+    if (idDocuments) {
+        for (const key in idDocuments) {
+            if (idDocuments[key] && idDocuments[key].data) {
+                uploadedIds.push({ key: key, data: idDocuments[key] });
+            }
+        }
+    }
+    
+    if (uploadedIds.length > 0) {
         addSectionHeader('IDENTIFICATION DOCUMENTS');
         
-        addField('ID Type', data.subscriber.idType);
+        // Display ID type from form data
+        if (data.subscriber.idType && data.subscriber.idType !== 'N/A') {
+            addField('ID Type Selected', data.subscriber.idType);
+        }
         
-        // Add ID images if available
-        const idTypes = data.subscriber.idType.split(', ');
+        yPos += 5;
         
-        for (const idType of idTypes) {
-            const idKey = idType.replace(/\s+/g, '_').toUpperCase();
-            
-            if (idDocuments && idDocuments[idKey] && idDocuments[idKey].data) {
-                try {
-                    yPos += 5;
-                    
-                    // Check if we need a new page
-                    if (yPos > 200) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-                    
-                    // Add ID document label
-                    doc.setFontSize(9);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(...colors.primaryBlue);
-                    doc.text(idType + ' Document:', 15, yPos);
-                    yPos += 5;
-                    
-                    // Add the image
-                    if (idDocuments[idKey].type.startsWith('image/')) {
-                        doc.addImage(idDocuments[idKey].data, 'JPEG', 15, yPos, 180, 100);
-                        doc.setDrawColor(...colors.lightGray);
-                        doc.setLineWidth(0.5);
-                        doc.rect(15, yPos, 180, 100, 'S');
-                        yPos += 105;
-                    } else {
-                        // For PDF files
-                        doc.setFont(undefined, 'normal');
-                        doc.setTextColor(...colors.darkGray);
-                        doc.text('PDF Document: ' + idDocuments[idKey].name, 15, yPos);
-                        yPos += 10;
-                    }
-                    
-                } catch (error) {
-                    console.log('Could not add ID document to PDF:', error);
+        // Add each uploaded ID document
+        for (const idDoc of uploadedIds) {
+            try {
+                // Check if we need a new page
+                if (yPos > 200) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                // Convert key to readable name
+                const idName = idDoc.key.replace(/_/g, ' ');
+                
+                // Add ID document label
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...colors.primaryBlue);
+                doc.text(idName + ' Document:', 15, yPos);
+                yPos += 7;
+                
+                // Add the image
+                if (idDoc.data.type && idDoc.data.type.startsWith('image/')) {
+                    // Add image with border
+                    doc.addImage(idDoc.data.data, 'JPEG', 15, yPos, 180, 100);
+                    doc.setDrawColor(...colors.lightGray);
+                    doc.setLineWidth(1);
+                    doc.rect(15, yPos, 180, 100, 'S');
+                    yPos += 108;
+                } else if (idDoc.data.type && idDoc.data.type === 'application/pdf') {
+                    // For PDF files, just show the filename
                     doc.setFont(undefined, 'normal');
                     doc.setTextColor(...colors.darkGray);
-                    doc.text('Document attached: ' + idDocuments[idKey].name, 15, yPos);
-                    yPos += 7;
+                    doc.setFontSize(9);
+                    doc.text('📄 PDF Document: ' + idDoc.data.name, 15, yPos);
+                    yPos += 10;
+                } else {
+                    // Fallback - show filename
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(...colors.darkGray);
+                    doc.setFontSize(9);
+                    doc.text('📎 Document: ' + (idDoc.data.name || 'Uploaded'), 15, yPos);
+                    yPos += 10;
                 }
+                
+            } catch (error) {
+                console.error('Error adding ID document to PDF:', error);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(...colors.darkRed);
+                doc.setFontSize(9);
+                doc.text('⚠ Error displaying document: ' + idDoc.data.name, 15, yPos);
+                yPos += 10;
             }
         }
         
