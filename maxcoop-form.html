@@ -9,26 +9,36 @@
     <!-- jsPDF Library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- PDF Generator (customizable) -->
+    <script src="pdf-generator.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Header Section -->
         <div class="header">
             <div class="logos">
-                <div class="logo-item">MAXCOOP</div>
-                <div class="logo-item">M</div>
-                <div class="logo-item">🏛️ COOP CITY ANAMBRA</div>
+                <img src="maxcoop-logo.jpg" alt="MAXCOOP" class="logo-image">
+                <img src="m-logo.jpg" alt="M" class="logo-image">
+                <img src="coop-city-logo.jpg" alt="COOP CITY ANAMBRA" class="logo-image">
             </div>
             <div class="photo-box">
-                <p>AFFIX<br>A PASSPORT<br>PHOTOGRAPH</p>
+                <div id="photoPreview" class="photo-preview">
+                    <p class="photo-placeholder">UPLOAD<br>PASSPORT<br>PHOTO</p>
+                    <img id="passportImage" style="display: none;" alt="Passport">
+                </div>
+                <input type="file" id="passportUpload" accept="image/*" style="display: none;">
+                <button type="button" class="upload-btn" onclick="document.getElementById('passportUpload').click()">📷 Upload Photo</button>
             </div>
         </div>
 
         <!-- Hero Image Section -->
-        <div class="hero-section">
-            <div class="hero-text">
-                <h2>COOP CITY, ANAMBRA</h2>
-                <p>Building Dreams, Creating Communities</p>
+        <div class="hero-section" style="background-image: url('hero-background.png');">
+            <div class="hero-overlay">
+                <div class="hero-text">
+                    <h2>COOP CITY, ANAMBRA</h2>
+                    <p>Building Dreams, Creating Communities</p>
+                </div>
             </div>
         </div>
 
@@ -56,7 +66,7 @@
                         <label><input type="checkbox" name="title" value="MRS"> MRS</label>
                         <label><input type="checkbox" name="title" value="MISS"> MISS</label>
                     </div>
-                    <input type="text" name="surname" class="block-input" placeholder="Surname" required>
+                    <input type="text" name="surname" class="block-input" placeholder="Surname" required><br />
                     <input type="text" name="otherNames" class="block-input" placeholder="Other Names" required>
                 </div>
             </div>
@@ -64,7 +74,7 @@
             <div class="form-row">
                 <div class="form-group full-width">
                     <label>NAME OF SPOUSE <span class="small-text">(If Applicable)</span></label>
-                    <input type="text" name="spouseSurname" class="block-input" placeholder="Surname">
+                    <input type="text" name="spouseSurname" class="block-input" placeholder="Surname"><br />
                     <input type="text" name="spouseOtherNames" class="block-input" placeholder="Other Names">
                 </div>
             </div>
@@ -162,10 +172,71 @@
                 <div class="form-group full-width">
                     <label>IDENTIFICATION CARD TYPE:*</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" name="idType" value="NATIONAL_ID"> NATIONAL ID CARD</label>
-                        <label><input type="checkbox" name="idType" value="DRIVERS_LICENCE"> DRIVER'S LICENCE</label>
-                        <label><input type="checkbox" name="idType" value="INTERNATIONAL_PASSPORT"> INTERNATIONAL PASSPORT</label>
-                        <label><input type="checkbox" name="idType" value="NIN"> NIN</label>
+                        <label><input type="checkbox" name="idType" value="NATIONAL_ID" onchange="toggleIdUpload('NATIONAL_ID')"> NATIONAL ID CARD</label>
+                        <label><input type="checkbox" name="idType" value="DRIVERS_LICENCE" onchange="toggleIdUpload('DRIVERS_LICENCE')"> DRIVER'S LICENCE</label>
+                        <label><input type="checkbox" name="idType" value="INTERNATIONAL_PASSPORT" onchange="toggleIdUpload('INTERNATIONAL_PASSPORT')"> INTERNATIONAL PASSPORT</label>
+                        <label><input type="checkbox" name="idType" value="NIN" onchange="toggleIdUpload('NIN')"> NIN</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ID Upload Sections (Hidden by default) -->
+            <div id="upload_NATIONAL_ID" class="id-upload-section" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>UPLOAD NATIONAL ID CARD*</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="file_NATIONAL_ID" accept="image/*,application/pdf" style="display: none;">
+                            <button type="button" class="upload-btn-secondary" onclick="document.getElementById('file_NATIONAL_ID').click()">
+                                📎 Upload National ID
+                            </button>
+                            <div id="preview_NATIONAL_ID" class="file-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="upload_DRIVERS_LICENCE" class="id-upload-section" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>UPLOAD DRIVER'S LICENCE*</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="file_DRIVERS_LICENCE" accept="image/*,application/pdf" style="display: none;">
+                            <button type="button" class="upload-btn-secondary" onclick="document.getElementById('file_DRIVERS_LICENCE').click()">
+                                📎 Upload Driver's Licence
+                            </button>
+                            <div id="preview_DRIVERS_LICENCE" class="file-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="upload_INTERNATIONAL_PASSPORT" class="id-upload-section" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>UPLOAD INTERNATIONAL PASSPORT*</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="file_INTERNATIONAL_PASSPORT" accept="image/*,application/pdf" style="display: none;">
+                            <button type="button" class="upload-btn-secondary" onclick="document.getElementById('file_INTERNATIONAL_PASSPORT').click()">
+                                📎 Upload International Passport
+                            </button>
+                            <div id="preview_INTERNATIONAL_PASSPORT" class="file-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="upload_NIN" class="id-upload-section" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>UPLOAD NIN DOCUMENT*</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="file_NIN" accept="image/*,application/pdf" style="display: none;">
+                            <button type="button" class="upload-btn-secondary" onclick="document.getElementById('file_NIN').click()">
+                                📎 Upload NIN
+                            </button>
+                            <div id="preview_NIN" class="file-preview"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,7 +284,14 @@
             <div class="section-header">SECTION 3: SUBSCRIBER'S DECLARATION</div>
 
             <div class="declaration-text">
-                <p>I hereby affirm that all information provided as a requirement for the purchase of the Coop City, Anambra state, situated at Ozubulu, Anambra state is true and any false or inaccurate information given by me may decline or may be rejected by Max.</p>
+                <p>I <input type="text" name="affirmationName" class="inline-input" placeholder="Type your full name here" required> hereby affirm that all information provided as a requirement for the purchase of the Coop City, Anambra state, situated at Ozubulu, Anambra state is true and any false or inaccurate information given by me may decline or may be rejected by Max.</p>
+                
+                <div class="affirmation-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="agreeToTerms" required>
+                        <span>I agree to the terms and conditions stated above and affirm that all information provided is accurate and true.</span>
+                    </label>
+                </div>
             </div>
 
             <div class="form-row">
@@ -291,34 +369,7 @@
             <p class="form-note">* PDF will be generated and your Gmail will open automatically. Just add maxcoopforms@gmail.com and send!</p>
         </form>
 
-        <!-- Footer -->
-        <div class="footer">
-            <div class="bank-details">
-                <p><strong>MAKE ALL PAYMENTS DIRECTLY INTO:</strong></p>
-                <div class="bank-info">
-                    <p><strong>POLARIS MAX ONITSHA</strong><br>
-                    1st Floor, Grace and Faith House<br>
-                    Beside UBA Bank, Onitsha-Enugu Express Way<br>
-                    Onitsha, Anambra State</p>
-                    
-                    <p><strong>POLARIS MAX UTUTU</strong><br>
-                    No 237 Ututu/Anambra Road<br>
-                    Behind Mama and Filling Station<br>
-                    Max Construction Housing Coop<br>
-                    Ututu/Maku, Anambra State</p>
-                    
-                    <p><strong>POLARIS MAX NNEWI</strong><br>
-                    1st Floor & Egedegede<br>
-                    Opp Polaris Bank, Umu Emed<br>
-                    Nnewi, Anambra State</p>
-                </div>
-            </div>
-            <div class="contact">
-                <p><strong>MAX CONSTRUCTION<br>HOUSING COOP</strong></p>
-                <p class="phone">5402057281</p>
-            </div>
-        </div>
-    </div>
+        
 
     <script src="maxcoop-form.js"></script>
 </body>

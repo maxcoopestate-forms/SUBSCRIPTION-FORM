@@ -4,6 +4,102 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('maxcoopForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const passportUpload = document.getElementById('passportUpload');
+    const passportImage = document.getElementById('passportImage');
+    const photoPreview = document.getElementById('photoPreview');
+    let passportImageData = null;
+
+    // Store uploaded ID documents
+    const idDocuments = {
+        NATIONAL_ID: null,
+        DRIVERS_LICENCE: null,
+        INTERNATIONAL_PASSPORT: null,
+        NIN: null
+    };
+
+    // Handle passport photo upload
+    passportUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                passportImageData = event.target.result;
+                passportImage.src = passportImageData;
+                passportImage.style.display = 'block';
+                photoPreview.querySelector('.photo-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Make toggleIdUpload and handleIdUpload globally accessible
+    window.toggleIdUpload = function(idType) {
+        const checkbox = document.querySelector(`input[name="idType"][value="${idType}"]`);
+        const uploadSection = document.getElementById(`upload_${idType}`);
+        
+        if (checkbox.checked) {
+            uploadSection.style.display = 'block';
+        } else {
+            uploadSection.style.display = 'none';
+            // Clear the uploaded file
+            const fileInput = document.getElementById(`file_${idType}`);
+            const preview = document.getElementById(`preview_${idType}`);
+            if (fileInput) fileInput.value = '';
+            if (preview) {
+                preview.classList.remove('active');
+                preview.innerHTML = '';
+            }
+            idDocuments[idType] = null;
+        }
+    };
+
+    window.handleIdUpload = function(idType) {
+        const fileInput = document.getElementById(`file_${idType}`);
+        const preview = document.getElementById(`preview_${idType}`);
+        const file = fileInput.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            idDocuments[idType] = {
+                name: file.name,
+                type: file.type,
+                data: e.target.result
+            };
+
+            // Show preview
+            preview.classList.add('active');
+            
+            if (file.type.startsWith('image/')) {
+                preview.innerHTML = `
+                    <div class="file-info">
+                        <p>✓ ${file.name} uploaded</p>
+                        <button type="button" class="remove-btn" onclick="removeIdUpload('${idType}')">Remove</button>
+                    </div>
+                    <img src="${e.target.result}" alt="ID Preview">
+                `;
+            } else {
+                preview.innerHTML = `
+                    <div class="file-info">
+                        <p>✓ ${file.name} uploaded (PDF)</p>
+                        <button type="button" class="remove-btn" onclick="removeIdUpload('${idType}')">Remove</button>
+                    </div>
+                `;
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.removeIdUpload = function(idType) {
+        const fileInput = document.getElementById(`file_${idType}`);
+        const preview = document.getElementById(`preview_${idType}`);
+        
+        fileInput.value = '';
+        preview.classList.remove('active');
+        preview.innerHTML = '';
+        idDocuments[idType] = null;
+    };
 
     // Auto-set today's date for declaration
     const today = new Date().toISOString().split('T')[0];
@@ -27,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Collect form data
             const formData = collectFormData();
 
-            // Generate PDF
-            const pdfBlob = await generatePDF(formData);
+            // Generate PDF with passport photo and ID documents
+            const pdfBlob = await generatePDF(formData, passportImageData, idDocuments);
             const fileName = `MAXCOOP_${formData.subscriber.surname}_${Date.now()}.pdf`;
 
             // Hide loading
@@ -209,6 +305,8 @@ That's it! Thank you for choosing MAXCOOP! 🏡
                 address: form.nokAddress.value
             },
             declaration: {
+                affirmationName: form.affirmationName.value,
+                agreeToTerms: form.agreeToTerms.checked,
                 plotType: getCheckedValue('plotType'),
                 numberOfPlots: form.numberOfPlots.value,
                 plotSize: getCheckedValue('plotSize'),
@@ -225,137 +323,6 @@ That's it! Thank you for choosing MAXCOOP! 🏡
             },
             submissionDate: new Date().toLocaleString()
         };
-    }
-
-    // Generate PDF from form data
-    async function generatePDF(data) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Colors
-        const primaryBlue = [30, 58, 138];
-        const primaryRed = [220, 38, 38];
-        const darkGray = [51, 51, 51];
-
-        let yPos = 20;
-
-        // Header
-        doc.setFillColor(...primaryBlue);
-        doc.rect(0, 0, 210, 40, 'F');
-        
-        doc.setFontSize(24);
-        doc.setTextColor(255, 255, 255);
-        doc.text('MAXCOOP', 105, 15, { align: 'center' });
-        
-        doc.setFontSize(18);
-        doc.text('COOP CITY, ANAMBRA', 105, 25, { align: 'center' });
-        
-        doc.setFontSize(14);
-        doc.setTextColor(251, 191, 36);
-        doc.text('SUBSCRIPTION FORM', 105, 33, { align: 'center' });
-
-        yPos = 50;
-
-        // Helper function to add section header
-        function addSectionHeader(title) {
-            doc.setFillColor(...primaryRed);
-            doc.rect(10, yPos, 190, 10, 'F');
-            doc.setFontSize(12);
-            doc.setTextColor(255, 255, 255);
-            doc.text(title, 15, yPos + 7);
-            yPos += 15;
-            doc.setTextColor(...darkGray);
-        }
-
-        // Helper function to add field
-        function addField(label, value, fullWidth = false) {
-            if (yPos > 270) {
-                doc.addPage();
-                yPos = 20;
-            }
-
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'bold');
-            doc.text(label + ':', 15, yPos);
-            
-            doc.setFont(undefined, 'normal');
-            const valueText = String(value || 'N/A');
-            
-            if (fullWidth) {
-                const splitText = doc.splitTextToSize(valueText, 170);
-                doc.text(splitText, 15, yPos + 5);
-                yPos += 5 + (splitText.length * 5);
-            } else {
-                doc.text(valueText, 80, yPos);
-                yPos += 7;
-            }
-        }
-
-        // SECTION 1: SUBSCRIBER'S DETAILS
-        addSectionHeader('SECTION 1: SUBSCRIBER\'S DETAILS');
-        
-        addField('Full Name', data.subscriber.fullName);
-        addField('Spouse Name', data.subscriber.spouseName);
-        addField('Address', data.subscriber.address, true);
-        addField('Date of Birth', data.subscriber.dob);
-        addField('Gender', data.subscriber.gender);
-        addField('Marital Status', data.subscriber.maritalStatus);
-        addField('Nationality', data.subscriber.nationality);
-        addField('Occupation', data.subscriber.occupation);
-        addField('Employer\'s Name', data.subscriber.employerName);
-        addField('Nature of Business', data.subscriber.businessNature);
-        addField('Years of Employment', data.subscriber.yearsOfEmployment);
-        addField('Country of Residence', data.subscriber.countryOfResidence);
-        addField('Language Spoken', data.subscriber.languageSpoken);
-        addField('Email Address', data.subscriber.email);
-        addField('Mobile Number', data.subscriber.mobileNumber);
-        addField('Other Income Source', data.subscriber.otherIncome);
-        addField('ID Type', data.subscriber.idType);
-        addField('Politically Exposed', data.subscriber.pep);
-        addField('PEP Category', data.subscriber.pepCategory);
-
-        yPos += 5;
-
-        // SECTION 2: NEXT OF KIN
-        addSectionHeader('SECTION 2: NEXT OF KIN');
-        
-        addField('Name', data.nextOfKin.name);
-        addField('Phone Number', data.nextOfKin.phone);
-        addField('Email Address', data.nextOfKin.email);
-        addField('Address', data.nextOfKin.address, true);
-
-        yPos += 5;
-
-        // SECTION 3: SUBSCRIBER'S DECLARATION
-        addSectionHeader('SECTION 3: SUBSCRIBER\'S DECLARATION');
-        
-        addField('Type of Plot', data.declaration.plotType);
-        addField('Number of Plots', data.declaration.numberOfPlots);
-        addField('Plot Size', data.declaration.plotSize);
-        addField('Corner Piece', data.declaration.cornerPiece);
-        addField('Payment Plan', data.declaration.paymentPlan);
-        addField('Signature', data.declaration.signature);
-        addField('Date', data.declaration.date);
-
-        yPos += 5;
-
-        // REFERRAL DETAILS (if provided)
-        if (data.referral.name !== 'N/A') {
-            addSectionHeader('REFERRAL DETAILS');
-            addField('Referral Name', data.referral.name);
-            addField('Referral Phone', data.referral.phone);
-            addField('Referral Email', data.referral.email);
-            addField('Referral Date', data.referral.date);
-        }
-
-        // Footer
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text('Submitted on: ' + data.submissionDate, 105, 285, { align: 'center' });
-        doc.text('MAX CONSTRUCTION HOUSING COOP | 5402057281', 105, 290, { align: 'center' });
-
-        // Convert to blob
-        return doc.output('blob');
     }
 
     // Helper function to get checked radio value

@@ -21,7 +21,7 @@ body {
 
 /* Header Section */
 .header {
-    background-color: #1e3a8a;
+    background:url(hero-background.png);
     padding: 20px;
     display: flex;
     justify-content: space-between;
@@ -33,24 +33,146 @@ body {
     display: flex;
     gap: 20px;
     align-items: center;
+    
 }
 
-.logo-item {
-    font-weight: bold;
-    font-size: 16px;
-    padding: 10px 15px;
+.logo-image {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
     background-color: white;
-    color: #1e3a8a;
+    padding: 5px;
     border-radius: 5px;
 }
 
 .photo-box {
     border: 3px solid white;
-    padding: 30px 25px;
+    padding: 15px;
     text-align: center;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    }
+
+.photo-preview {
+    width: 120px;
+    height: 140px;
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-placeholder {
     font-size: 11px;
     line-height: 1.4;
-    min-width: 150px;
+    color: white;
+}
+
+#passportImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    background-color: white;
+    color: #1e3a8a;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* ID Upload Sections */
+.id-upload-section {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f0f9ff;
+    border-left: 3px solid #3b82f6;
+    border-radius: 4px;
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-btn-secondary {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: fit-content;
+}
+
+.upload-btn-secondary:hover {
+    background-color: #2563eb;
+}
+
+.file-preview {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    display: none;
+}
+
+.file-preview.active {
+    display: block;
+    border: 2px solid #10b981;
+}
+
+.file-preview img {
+    max-width: 300px;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.file-preview p {
+    margin: 5px 0;
+    font-size: 13px;
+    color: #059669;
+    font-weight: bold;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-info .remove-btn {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.file-info .remove-btn:hover {
+    background-color: #b91c1c;
 }
 
 /* Hero Section */
@@ -58,11 +180,28 @@ body {
     width: 100%;
     height: 200px;
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.hero-overlay {
+    background: rgba(30, 58, 138, 0.7);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-text {
     color: white;
     text-align: center;
+    z-index: 1;
 }
 
 .hero-text h2 {
@@ -136,7 +275,7 @@ body {
 }
 
 .section-header {
-    background-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626 0%, #22079c 100%);
     color: white;
     padding: 12px 20px;
     font-weight: bold;
@@ -304,6 +443,54 @@ input[type="radio"] {
     color: #334155;
 }
 
+.inline-input {
+    display: inline-block;
+    min-width: 200px;
+    padding: 4px 8px;
+    border: none;
+    border-bottom: 2px solid #3b82f6;
+    background-color: transparent;
+    font-size: 13px;
+    font-weight: bold;
+    color: #1e3a8a;
+    text-transform: uppercase;
+}
+
+.inline-input:focus {
+    outline: none;
+    border-bottom-color: #1e3a8a;
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.affirmation-checkbox {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: rgba(59, 130, 246, 0.05);
+    border-radius: 4px;
+    border: 1px solid #3b82f6;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: normal;
+    text-transform: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.checkbox-label span {
+    line-height: 1.6;
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
 /* Form Note */
 .form-note {
     text-align: center;
@@ -315,7 +502,7 @@ input[type="radio"] {
 
 /* Submit Button */
 .submit-btn {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #22079c 100%);
     color: white;
     padding: 16px 50px;
     border: none;
@@ -332,7 +519,7 @@ input[type="radio"] {
 }
 
 .submit-btn:hover {
-    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    background: linear-gradient(135deg, #b91c1c 0%, #c4c70b 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
@@ -353,13 +540,13 @@ input[type="radio"] {
     color: white;
     padding: 25px 30px;
     display: flex;
-    justify-content: space-between;
+    justify-content:baseline;
     font-size: 11px;
     line-height: 1.8;
 }
 
 .bank-details {
-    flex: 1;
+    flex: 2;
 }
 
 .bank-details p {
